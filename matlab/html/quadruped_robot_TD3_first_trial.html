@@ -1,0 +1,479 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      -->
+<title>quadruped_robot_TD3_first_trial</title>
+<meta name="generator" content="MATLAB 24.2">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<meta name="DC.date" content="2025-05-07">
+<meta name="DC.source" content="quadruped_robot_TD3_first_trial.m">
+<style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style>
+</head>
+<body>
+<div class="content">
+<h2>Contents</h2>
+<div>
+<ul>
+<li>
+<a href="#2">Quadruped Robot Model</a>
+</li>
+<li>
+<a href="#3">Create Environment Object</a>
+</li>
+<li>
+<a href="#4"><b> |Create TD3 Agent Object(*</b>* check!)</a>
+</li>
+<li>
+<a href="#5"><b>% Set the agent in Simulink model ( * _</b> check!_ * )*</a>
+</li>
+<li>
+<a href="#6">Specify Training Options *check!1!!!!!)</a>
+</li>
+<li>
+<a href="#7">Train Agent</a>
+</li>
+<li>
+<a href="#8">Simulate Trained Agent</a>
+</li>
+<li>
+<a href="#9">Restore the random number stream using the information stored in previousRngState.</a>
+</li>
+<li>
+<a href="#10">result</a>
+</li>
+</ul>
+</div>
+<pre class="codeinput">
+<span class="comment">% Fix Random Seed Generator to Improve Reproducibility</span>
+previousRngState = rng(0,<span class="string">"twister"</span>);
+
+<span class="comment">% load the necessary parameters into the base workspace in MATLAB</span>
+initializeRobotParameters;
+</pre>
+<h2 id="2">Quadruped Robot Model</h2>
+<pre class="codeinput">mdl = <span class="string">"rlQuadrupedRobot"</span>;
+open_system(mdl)
+</pre>
+<h2 id="3">Create Environment Object</h2>
+<pre class="codeinput"> <span class="comment">% Specify the parameters for the observation set.</span>
+numObs = 44;
+obsInfo = rlNumericSpec([numObs 1]);
+obsInfo.Name = <span class="string">"observations"</span>;
+
+ <span class="comment">% Specify the parameters for the action set.</span>
+numAct = 8;
+actInfo = rlNumericSpec([numAct 1],LowerLimit=-1,UpperLimit=1);
+actInfo.Name = <span class="string">"torque"</span>;
+
+ <span class="comment">% Create the environment using the reinforcement learning model.</span>
+blk = mdl + <span class="string">"/RL Agent"</span>;
+env = rlSimulinkEnv(mdl,blk,obsInfo,actInfo);
+
+ <span class="comment">% introduces random deviations into the initial joint angles and angular velocities.</span>
+env.ResetFcn = @quadrupedResetFcn;
+</pre>
+<h2 id="4">
+<b> |Create TD3 Agent Object(*</b>* check!)</h2>
+<pre class="codeinput">rng(0,<span class="string">"twister"</span>);
+<span class="comment">% Create the TD3 agent options</span>
+agentOptions = rlTD3AgentOptions();
+
+<span class="comment">% Specify the options</span>
+agentOptions.SampleTime = Ts;   <span class="comment">% Sample time</span>
+agentOptions.MiniBatchSize = 256;   <span class="comment">% Mini batch size</span>
+agentOptions.ExperienceBufferLength = 1e6;  <span class="comment">% Experience buffer length</span>
+agentOptions.MaxMiniBatchPerEpoch = 200;   <span class="comment">% Max mini-batches per epoch</span>
+
+<span class="comment">% Optimizer options (same as DDPG)</span>
+agentOptions.ActorOptimizerOptions.LearnRate = 1e-3;
+agentOptions.CriticOptimizerOptions.LearnRate = 1e-3;
+
+<span class="comment">% Exploration options (same as DDPG)</span>
+agentOptions.NoiseOptions.StandardDeviation = 0.1;
+initOpts = rlAgentInitializationOptions(NumHiddenUnit=256);
+agent = createTD3Agent(obsInfo, actInfo, initOpts, agentOptions);
+</pre>
+<h2 id="5">
+<b>% Set the agent in Simulink model ( * _</b> check!_ * )*</h2>
+<p>set_param('rlQuadrupedRobot/RL Agent', 'Agent', 'agent'); actor = getActor(agent); critic = getCritic(agent); actorNet = getModel(actor); criticNet = getModel(critic(1)); summary(actorNet); plot(actorNet); summary(criticNet); plot(criticNet);</p>
+<pre class="codeoutput error">Assigning to 2 elements
+using a simple
+assignment statement is
+not supported. Consider
+using comma-separated
+list assignment.
+
+Error in quadruped_robot_TD3_first_trial (line 44)
+agentOptions.CriticOptimizerOptions.LearnRate = 1e-3;
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
+<h2 id="6">Specify Training Options *check!1!!!!!)</h2>
+<pre class="codeinput">trainOpts = rlTrainingOptions(<span class="keyword">...</span>
+    MaxEpisodes=100,<span class="keyword">...</span>
+    trainOptsMaxStepsPerEpisode=100,<span class="keyword">...</span>
+    MaxStepsPerEpisode=floor(Tf/Ts),<span class="keyword">...</span>
+    ScoreAveragingWindowLength=250,<span class="keyword">...</span>
+    Plots=<span class="string">"training-progress"</span>,<span class="keyword">...</span>
+    StopTrainingCriteria=<span class="string">"EvaluationStatistic"</span>,<span class="keyword">...</span>
+    StopTrainingValue=300);
+
+<span class="comment">%  train the agent in parallel</span>
+trainOpts.UseParallel = true;
+trainOpts.ParallelizationOptions.Mode = <span class="string">"async"</span>;
+</pre>
+<h2 id="7">Train Agent</h2>
+<pre class="codeinput">
+<span class="comment">% Fix the random stream for reproducibility.</span>
+rng(0,<span class="string">"twister"</span>);
+
+<span class="comment">% Set the doTraining flag</span>
+doTraining = false;
+<span class="keyword">if</span> doTraining
+    <span class="comment">% Train the agent.</span>
+    <span class="comment">%result = train(agent, env, trainOpts);</span>
+    result = train(agent, env, trainOpts, Evaluator=evaluator);
+<span class="keyword">else</span>
+    <span class="comment">% Load pretrained agent parameters for the example, if the file exists</span>
+        load(<span class="string">"rlQuadrupedAgentParams.mat"</span>,<span class="string">"params"</span>)
+    setLearnableParameters(agent, params);
+    <span class="comment">%pretrainedFile = "rlQuadrupedAgentParams.mat";</span>
+    <span class="comment">% if exist(pretrainedFile, 'file')  % Check if the file exists before loading</span>
+    <span class="comment">%     load(pretrainedFile, "params");</span>
+    <span class="comment">% else</span>
+    <span class="comment">%     load(pretrainedFile, "params");</span>
+    <span class="comment">% end</span>
+<span class="keyword">end</span>
+</pre>
+<h2 id="8">Simulate Trained Agent</h2>
+<pre class="codeinput">
+<span class="comment">% Fix the random stream for reproducibility.</span>
+ rng(0,<span class="string">"twister"</span>);
+<span class="comment">% To validate the performance of the trained agent, simulate it within the robot environment.</span>
+simOptions = rlSimulationOptions(MaxSteps=floor(Tf/Ts));
+experience = sim(env,agent,simOptions);
+</pre>
+<h2 id="9">Restore the random number stream using the information stored in previousRngState.</h2>
+<pre class="codeinput">rng(previousRngState);
+</pre>
+<h2 id="10">result</h2>
+<p>Performance Metrics for Robot Locomotion (Robotics Perspective) Example Data for Simulation (You can replace these with real data)</p>
+<pre class="codeinput">time = 0:1:10; <span class="comment">% Time (seconds) for 10-second simulation</span>
+distance_travelled = cumsum(rand(1,10)*0.5); <span class="comment">% Simulated distance (meters)</span>
+speed = diff([0, distance_travelled]); <span class="comment">% Speed (m/s), using diff to get speed between steps</span>
+energy_consumed = cumsum(rand(1,10)*10); <span class="comment">% Simulated energy (Joules)</span>
+
+<span class="comment">% Roll, Pitch, and Yaw angles (random data, replace with actual values)</span>
+roll = rand(1,10) * 10 - 5; <span class="comment">% Roll angles (-5 to 5 degrees)</span>
+pitch = rand(1,10) * 10 - 5; <span class="comment">% Pitch angles (-5 to 5 degrees)</span>
+yaw = rand(1,10) * 20 - 10; <span class="comment">% Yaw angles (-10 to 10 degrees)</span>
+
+<span class="comment">% Efficiency (Energy consumption per unit distance)</span>
+efficiency = energy_consumed ./ distance_travelled;
+
+<span class="comment">% 1. Plot Speed (meters per second)</span>
+figure;
+plot(time(2:end), speed, <span class="string">'LineWidth'</span>, 2);
+title(<span class="string">'Robot Speed vs Time'</span>);
+xlabel(<span class="string">'Time (seconds)'</span>);
+ylabel(<span class="string">'Speed (m/s)'</span>);
+grid <span class="string">on</span>;
+<span class="comment">% Display the plot</span>
+disp(<span class="string">'Displaying Speed vs Time plot...'</span>);
+shg;  <span class="comment">% Bring figure window to front</span>
+<span class="comment">% Save the plot as an image</span>
+saveas(gcf, <span class="string">'robot_speed_vs_time.png'</span>);
+
+<span class="comment">% 2. Plot Efficiency (Energy consumption per unit distance)</span>
+figure;
+plot(distance_travelled, efficiency, <span class="string">'LineWidth'</span>, 2);
+title(<span class="string">'Energy Efficiency vs Distance'</span>);
+xlabel(<span class="string">'Distance (meters)'</span>);
+ylabel(<span class="string">'Energy Efficiency (Joules/m)'</span>);
+grid <span class="string">on</span>;
+<span class="comment">% Display the plot</span>
+disp(<span class="string">'Displaying Energy Efficiency vs Distance plot...'</span>);
+shg;  <span class="comment">% Bring figure window to front</span>
+<span class="comment">% Save the plot as an image</span>
+saveas(gcf, <span class="string">'energy_efficiency_vs_distance.png'</span>);
+
+<span class="comment">% 3. Plot Stability (Roll, Pitch, and Yaw)</span>
+figure;
+subplot(3,1,1);
+plot(time, roll, <span class="string">'r-'</span>, <span class="string">'LineWidth'</span>, 2);
+title(<span class="string">'Roll Angle vs Time'</span>);
+xlabel(<span class="string">'Time (seconds)'</span>);
+ylabel(<span class="string">'Roll Angle (degrees)'</span>);
+grid <span class="string">on</span>;
+
+subplot(3,1,2);
+plot(time, pitch, <span class="string">'b-'</span>, <span class="string">'LineWidth'</span>, 2);
+title(<span class="string">'Pitch Angle vs Time'</span>);
+xlabel(<span class="string">'Time (seconds)'</span>);
+ylabel(<span class="string">'Pitch Angle (degrees)'</span>);
+grid <span class="string">on</span>;
+
+subplot(3,1,3);
+plot(time, yaw, <span class="string">'g-'</span>, <span class="string">'LineWidth'</span>, 2);
+title(<span class="string">'Yaw Angle vs Time'</span>);
+xlabel(<span class="string">'Time (seconds)'</span>);
+ylabel(<span class="string">'Yaw Angle (degrees)'</span>);
+grid <span class="string">on</span>;
+<span class="comment">% Display the plot</span>
+disp(<span class="string">'Displaying Robot Stability vs Time plot...'</span>);
+shg;  <span class="comment">% Bring figure window to front</span>
+<span class="comment">% Save the plot as an image</span>
+saveas(gcf, <span class="string">'robot_stability_vs_time.png'</span>);
+</pre>
+<p class="footer">
+<br>
+<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2024b</a>
+<br>
+</p>
+</div>
+<!--
+##### SOURCE BEGIN #####
+% Fix Random Seed Generator to Improve Reproducibility
+previousRngState = rng(0,"twister");
+
+% load the necessary parameters into the base workspace in MATLAB
+initializeRobotParameters;
+%% Quadruped Robot Model
+
+mdl = "rlQuadrupedRobot";
+open_system(mdl)
+
+
+%% Create Environment Object
+
+ % Specify the parameters for the observation set.
+numObs = 44;
+obsInfo = rlNumericSpec([numObs 1]);
+obsInfo.Name = "observations";
+
+ % Specify the parameters for the action set.
+numAct = 8;
+actInfo = rlNumericSpec([numAct 1],LowerLimit=-1,UpperLimit=1);
+actInfo.Name = "torque";
+
+ % Create the environment using the reinforcement learning model.
+blk = mdl + "/RL Agent";
+env = rlSimulinkEnv(mdl,blk,obsInfo,actInfo);
+
+ % introduces random deviations into the initial joint angles and angular velocities.
+env.ResetFcn = @quadrupedResetFcn;
+
+%% * |Create TD3 Agent Object(************************************* check!)
+rng(0,"twister");
+% Create the TD3 agent options
+agentOptions = rlTD3AgentOptions();
+
+% Specify the options
+agentOptions.SampleTime = Ts;   % Sample time
+agentOptions.MiniBatchSize = 256;   % Mini batch size
+agentOptions.ExperienceBufferLength = 1e6;  % Experience buffer length
+agentOptions.MaxMiniBatchPerEpoch = 200;   % Max mini-batches per epoch
+
+% Optimizer options (same as DDPG)
+agentOptions.ActorOptimizerOptions.LearnRate = 1e-3;
+agentOptions.CriticOptimizerOptions.LearnRate = 1e-3;
+
+% Exploration options (same as DDPG)
+agentOptions.NoiseOptions.StandardDeviation = 0.1;
+initOpts = rlAgentInitializationOptions(NumHiddenUnit=256);
+agent = createTD3Agent(obsInfo, actInfo, initOpts, agentOptions);
+
+%%% *% Set the agent in Simulink model ( * _************************************* check!_ * )* 
+% set_param('rlQuadrupedRobot/RL Agent', 'Agent', 'agent');
+% actor = getActor(agent);
+% critic = getCritic(agent);
+% actorNet = getModel(actor);
+% criticNet = getModel(critic(1));
+% summary(actorNet);
+% plot(actorNet);
+% summary(criticNet);
+% plot(criticNet);
+%% Specify Training Options (*************check!1!!!!!)
+
+trainOpts = rlTrainingOptions(...
+    MaxEpisodes=100,...
+    trainOptsMaxStepsPerEpisode=100,...
+    MaxStepsPerEpisode=floor(Tf/Ts),...
+    ScoreAveragingWindowLength=250,...
+    Plots="training-progress",...
+    StopTrainingCriteria="EvaluationStatistic",...
+    StopTrainingValue=300);
+
+%  train the agent in parallel
+trainOpts.UseParallel = true;
+trainOpts.ParallelizationOptions.Mode = "async";
+%% Train Agent
+
+% Fix the random stream for reproducibility.
+rng(0,"twister");
+
+% Set the doTraining flag
+doTraining = false;
+if doTraining      
+    % Train the agent.
+    %result = train(agent, env, trainOpts);
+    result = train(agent, env, trainOpts, Evaluator=evaluator);
+else
+    % Load pretrained agent parameters for the example, if the file exists
+        load("rlQuadrupedAgentParams.mat","params")
+    setLearnableParameters(agent, params);
+    %pretrainedFile = "rlQuadrupedAgentParams.mat";
+    % if exist(pretrainedFile, 'file')  % Check if the file exists before loading
+    %     load(pretrainedFile, "params");
+    % else
+    %     load(pretrainedFile, "params");
+    % end
+end
+
+%% Simulate Trained Agent
+
+% Fix the random stream for reproducibility.
+ rng(0,"twister");
+% To validate the performance of the trained agent, simulate it within the robot environment.
+simOptions = rlSimulationOptions(MaxSteps=floor(Tf/Ts));
+experience = sim(env,agent,simOptions);
+
+%% Restore the random number stream using the information stored in previousRngState.
+rng(previousRngState); 
+%% result
+% Performance Metrics for Robot Locomotion (Robotics Perspective)
+% Example Data for Simulation (You can replace these with real data)
+time = 0:1:10; % Time (seconds) for 10-second simulation
+distance_travelled = cumsum(rand(1,10)*0.5); % Simulated distance (meters)
+speed = diff([0, distance_travelled]); % Speed (m/s), using diff to get speed between steps
+energy_consumed = cumsum(rand(1,10)*10); % Simulated energy (Joules)
+
+% Roll, Pitch, and Yaw angles (random data, replace with actual values)
+roll = rand(1,10) * 10 - 5; % Roll angles (-5 to 5 degrees)
+pitch = rand(1,10) * 10 - 5; % Pitch angles (-5 to 5 degrees)
+yaw = rand(1,10) * 20 - 10; % Yaw angles (-10 to 10 degrees)
+
+% Efficiency (Energy consumption per unit distance)
+efficiency = energy_consumed ./ distance_travelled; 
+
+% 1. Plot Speed (meters per second)
+figure;
+plot(time(2:end), speed, 'LineWidth', 2);
+title('Robot Speed vs Time');
+xlabel('Time (seconds)');
+ylabel('Speed (m/s)');
+grid on;
+% Display the plot
+disp('Displaying Speed vs Time plot...');
+shg;  % Bring figure window to front
+% Save the plot as an image
+saveas(gcf, 'robot_speed_vs_time.png'); 
+
+% 2. Plot Efficiency (Energy consumption per unit distance)
+figure;
+plot(distance_travelled, efficiency, 'LineWidth', 2);
+title('Energy Efficiency vs Distance');
+xlabel('Distance (meters)');
+ylabel('Energy Efficiency (Joules/m)');
+grid on;
+% Display the plot
+disp('Displaying Energy Efficiency vs Distance plot...');
+shg;  % Bring figure window to front
+% Save the plot as an image
+saveas(gcf, 'energy_efficiency_vs_distance.png'); 
+
+% 3. Plot Stability (Roll, Pitch, and Yaw)
+figure;
+subplot(3,1,1);
+plot(time, roll, 'r-', 'LineWidth', 2);
+title('Roll Angle vs Time');
+xlabel('Time (seconds)');
+ylabel('Roll Angle (degrees)');
+grid on;
+
+subplot(3,1,2);
+plot(time, pitch, 'b-', 'LineWidth', 2);
+title('Pitch Angle vs Time');
+xlabel('Time (seconds)');
+ylabel('Pitch Angle (degrees)');
+grid on;
+
+subplot(3,1,3);
+plot(time, yaw, 'g-', 'LineWidth', 2);
+title('Yaw Angle vs Time');
+xlabel('Time (seconds)');
+ylabel('Yaw Angle (degrees)');
+grid on;
+% Display the plot
+disp('Displaying Robot Stability vs Time plot...');
+shg;  % Bring figure window to front
+% Save the plot as an image
+saveas(gcf, 'robot_stability_vs_time.png'); 
+
+##### SOURCE END #####
+-->
+</body>
+</html>
