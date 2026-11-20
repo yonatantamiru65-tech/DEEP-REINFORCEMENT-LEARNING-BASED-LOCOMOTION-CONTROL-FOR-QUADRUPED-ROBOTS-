@@ -1,6 +1,6 @@
 # Quadruped Locomotion with Deep Reinforcement Learning
 
-**Yonatan Tamiru Asfaw Â· MATLAB / Simulink Â· TD3 and DDPG**
+**Yonatan Tamiru Asfaw  |  MATLAB / Simulink  |  TD3 and DDPG**
 
 A quadruped locomotion project bringing together a Simscape robot model, reinforcement-learning policies, original training artifacts, network diagrams and a thesis report.
 

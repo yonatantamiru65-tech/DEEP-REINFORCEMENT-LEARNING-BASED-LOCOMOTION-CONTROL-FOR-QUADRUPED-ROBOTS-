@@ -1,0 +1,4 @@
+# Historical notebook is reference material, not quadruped source.
+2026_01_09_unicycle_example_lg.ipynb linguist-documentation
+# Existing exported report HTML is generated documentation.
+matlab/html/** linguist-generated
