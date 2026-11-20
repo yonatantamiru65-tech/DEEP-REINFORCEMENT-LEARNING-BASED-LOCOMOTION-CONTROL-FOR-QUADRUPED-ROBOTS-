@@ -1,0 +1,16 @@
+# Generated MATLAB/Simulink files
+slprj/
+codegen/
+*.slxc
+*.asv
+*.m~
+*.autosave
+*.mex*
+generated/
+generated-smoke-test.mat
+*.slx.original
+# Full Designer sessions are release assets
+ReinforcementLearningDesignerSession*.mat
+# Operating system files
+.DS_Store
+Thumbs.db
